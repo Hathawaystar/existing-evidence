@@ -1,7 +1,7 @@
 <template>
   <section class="todoapp">
     <!-- header -->
-    <header class="header">
+    <header class="head">
       <input class="new-todo" autocomplete="off" placeholder="Todo List" @keyup.enter="addTodo">
     </header>
     <!-- main section -->
