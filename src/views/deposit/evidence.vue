@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container background">
     <h3 align="center">申请公证</h3>
     <el-form ref="form" size="large" :model="form" :rules="rules" label-width="150px" class="form">
       <el-form-item label="作品名称" prop="name">
@@ -25,6 +25,7 @@
           size="large"
           :options="options"
           placeholder="请选择联系地址"
+          style="width: 700px"
         />
       </el-form-item>
       <el-form-item label="详细地址" prop="addrDetail">
@@ -92,4 +93,7 @@ export default {
   width: 700px;
   margin: 50px auto;
 }
+  .background{
+    padding: 40px;
+  }
 </style>

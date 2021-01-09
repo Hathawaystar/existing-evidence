@@ -23,12 +23,6 @@ const infringementRouter = {
       component: () => import('@/views/infringement/list'),
       name: 'EvidenceList',
       meta: { title: '取证列表', noCache: true }
-    },
-    {
-      path: 'evidence',
-      component: () => import('@/views/infringement/evidence'),
-      name: 'Evidence',
-      meta: { title: '申请公证', noCache: true }
     }
   ]
 }

@@ -3,10 +3,10 @@
     <div class="logo">
       <img src="../../assets/login_image/logo.png" alt="">
     </div>
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+    <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">账号登录</h3>
+        <h3 class="title">用户注册</h3>
       </div>
 
       <div class="login-content">
@@ -15,10 +15,9 @@
             <!--<svg-icon icon-class="user" />-->
             <img src="../../assets/other_image/yonghu.png">
           </span>
-          <span>用户名：</span>
           <el-input
             ref="username"
-            v-model="loginForm.username"
+            v-model="registerForm.username"
             placeholder="请输入手机号"
             name="username"
             type="text"
@@ -26,18 +25,35 @@
             autocomplete="on"
           />
         </el-form-item>
-
+        <el-form-item prop="code" style="width:60%;position:relative;">
+          <span class="svg-container">
+            <!--<svg-icon icon-class="user" />-->
+            <img src="../../assets/other_image/yanzhengma.png">
+          </span>
+          <el-input
+            ref="code"
+            v-model="registerForm.code"
+            placeholder="请输入验证码"
+            name="code"
+            type="text"
+            tabindex="1"
+            autocomplete="on"
+            style="width:74%;"
+          />
+          <span style="display:inline-block;position:absolute;top:0;right:-97px;z-index:1000;width:60%;height:36.56px;border:1px solid #a1a1a1;border-radius:5px;">
+            <img src="../../assets/other_image/yanzhengma.jpg" alt="" style="width:100%;height:34.56px;">
+          </span>
+        </el-form-item>
         <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
           <el-form-item prop="password">
             <span class="svg-container">
               <!--<svg-icon icon-class="password" />-->
               <img src="../../assets/other_image/mima.png">
             </span>
-            <span>密 <b style="display:inline-block;width:6px;" /> 码：</span>
             <el-input
               :key="passwordType"
               ref="password"
-              v-model="loginForm.password"
+              v-model="registerForm.password"
               :type="passwordType"
               placeholder="请输入登录密码"
               name="password"
@@ -52,17 +68,33 @@
             </span>
           </el-form-item>
         </el-tooltip>
+        <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+          <el-form-item prop="re_password">
+            <span class="svg-container">
+              <!--<svg-icon icon-class="password" />-->
+              <img src="../../assets/other_image/mima.png">
+            </span>
+            <el-input
+              :key="passwordType"
+              ref="re_password"
+              v-model="registerForm.re_password"
+              :type="passwordType"
+              placeholder="请确认登录密码"
+              name="re_password"
+              tabindex="2"
+              autocomplete="on"
+              @keyup.native="checkCapslock"
+              @blur="capsTooltip = false"
+              @keyup.enter.native="handleLogin"
+            />
+            <span class="show-pwd" @click="showPwd">
+              <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+            </span>
+          </el-form-item>
+        </el-tooltip>
 
-        <el-form-item prop="remember">
-          <el-checkbox ref="remember" v-model="loginForm.remember" name="remember" value="1" />
-          <span>记住密码</span>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button style="width:25%;background-color:#a1a1a1;color:#fff;margin:6px 0 0 15%;" @click="registerPage">注册</el-button>
-          <el-button :loading="loading" style="margin:0 0 30px 25%; background-color:#10429a;color:#fff;width:25%;" @click="handleLogin">登录</el-button>
-        </el-form-item>
-
+        <el-button :loading="loading" style="margin-bottom:18px; background-color:#10429a;color:#fff;width:100%;" @click="handleRegister">完成</el-button>
+        <p style="color:#10429a;margin:0 auto;margin-left:30%;font-size:12px;cursor:pointer;" @click="linkToLogin">已有账号？立即登录</p>
       </div>
 
     </el-form>
@@ -73,11 +105,11 @@
 <script>
 
 export default {
-  name: 'Login',
+  name: 'Register',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!value) {
-        callback(new Error('用户名必填'))
+        callback(new Error('必填'))
       } else {
         callback()
       }
@@ -90,12 +122,13 @@ export default {
       }
     }
     return {
-      loginForm: {
-        username: 'admin',
-        password: '111111',
-        remember: 0
+      registerForm: {
+        username: '',
+        code: '',
+        password: '',
+        re_password: ''
       },
-      loginRules: {
+      registerRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
@@ -111,7 +144,6 @@ export default {
     $route: {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect
-        console.log(1, route.query, route.query.redirect)
       },
       immediate: true
     }
@@ -131,11 +163,11 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
+          this.$store.dispatch('user/login', this.registerForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
@@ -150,9 +182,9 @@ export default {
       })
     },
 
-    registerPage() {
+    linkToLogin() {
       console.log(1)
-      this.$router.replace('/register')
+      this.$router.replace('/login')
     }
   }
 }
@@ -176,21 +208,22 @@ export default {
   .login-container {
     .login-content {
       margin: 0 auto;
-      width: 320px;
+      width: 240px;
     }
     .el-input {
       display: inline-block;
-      height: 47px;
-      width: 65%;
+      width: 80%;
+      height:20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       background-color:#fff !important;
 
       input {
-        //background: transparent;
-        //border: 0px;
+        height:20px;
+        background: transparent;
+        border: 0px;
         //-webkit-appearance: none;
-        //border-radius: 0px;
-        //padding: 12px 5px 12px 15px;
+        border-radius: 0px;
+        padding: 0;
         color: #a1a1a1;
         //height: 47px;
         //caret-color: $cursor;
@@ -206,15 +239,11 @@ export default {
     }
 
     .el-form-item {
-      margin-bottom: 10px;
-      //border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 18px;
+      border: 1px solid #a1a1a1;
       //background: rgba(0, 0, 0, 0.1);
-      //border-radius: 5px;
+      border-radius: 5px;
       //color: #454545;
-    }
-    .el-form-item__error{
-      top: 86% !important;
-      left: 94px !important;
     }
   }
 </style>
@@ -239,13 +268,13 @@ export default {
     }
 
     .login-form {
-      width: 460px;
+      width: 480px;
       max-width: 100%;
-      height: 313px;
+      height: 383px;
       padding: 0 35px;
       margin: 0 auto;
       position: fixed;
-      top: 28%;
+      top: 26%;
       left: 40%;
       right:0;
       bottom:0;
@@ -267,13 +296,12 @@ export default {
     }
 
     .svg-container {
-      padding: 6px 5px 6px 15px;
+      padding-left:12px;
       color: $dark_gray;
-      vertical-align: middle;
-      width: 30px;
+      //vertical-align: middle;
+      width: 36px;
       display: inline-block;
-      margin-right:6px;
-
+      //margin-right:6px;
       img{
         vertical-align: middle;
       }
@@ -285,7 +313,7 @@ export default {
       .title {
         font-size: 18px;
         color: #333333;
-        margin: 36px auto 26px auto;
+        margin: 24px auto 24px auto;
         text-align: center;
         font-weight: bold;
       }
@@ -293,8 +321,8 @@ export default {
 
     .show-pwd {
       position: absolute;
-      right: 26px;
-      top: 7px;
+      right: 12px;
+      top: 5px;
       font-size: 16px;
       color: $dark_gray;
       cursor: pointer;
