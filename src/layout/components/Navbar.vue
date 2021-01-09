@@ -1,8 +1,5 @@
 <template>
   <div class="navbar">
-    <!--<hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />-->
-
-    <!--<breadcrumb id="breadcrumb-container" class="breadcrumb-container" />-->
     <div class="logo" style="float:left;margin:12px 0 12px 48px;">
       <img src="../../assets/login_image/logo_1.png">
     </div>
@@ -52,23 +49,20 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
   height: 64px;
-  overflow: hidden;
-  position: relative;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  z-index: 2000;
 
   .hamburger-container {
     line-height: 46px;
     height: 100%;
-    float: left;
     cursor: pointer;
     transition: background .3s;
     -webkit-tap-highlight-color:transparent;
-
-    /*&:hover {*/
-      /*background: rgba(0, 0, 0, .025)*/
-    /*}*/
   }
 
   .breadcrumb-container {
@@ -81,7 +75,6 @@ export default {
   }
 
   .right-menu {
-    float: right;
     height: 100%;
     line-height: 50px;
 

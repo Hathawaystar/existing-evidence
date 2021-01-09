@@ -103,7 +103,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'Register',
   data() {
