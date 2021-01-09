@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-editor-container">
+  <div class="app-container dashboard-editor-container">
     <!--<github-corner class="github-corner" />-->
 
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
@@ -97,6 +97,7 @@ export default {
   padding: 24px;
   background-color: rgb(240, 242, 245);
   position: relative;
+  height: calc(100vh - 112px);
 
   .github-corner {
     position: absolute;
