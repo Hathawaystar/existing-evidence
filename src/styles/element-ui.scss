@@ -82,3 +82,12 @@
 .el-range-separator {
   box-sizing: content-box;
 }
+
+.el-button--primary{
+  background-color: $themeColor;
+  border-color: $themeColor;
+}
+
+.el-button--primary:hover{
+  background-color: $themeColor;
+}

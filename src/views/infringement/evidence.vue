@@ -8,10 +8,11 @@
       <el-form-item label="作者名称" prop="author">
         <el-input v-model="form.author" placeholder="请输入作者名称" />
       </el-form-item>
-      <el-form-item label="公证书份数" prop="count">
-        <el-input v-model="form.count" placeholder="请输入公证书份数" />
+      <el-form-item label="公证书份数" type="number" prop="count">
+        <el-input-number v-model="form.count" :min="3" :max="1000" label="份数" />
+        <div style="font-size: smaller;color: red;margin-bottom: -20px;padding-bottom: 0">默认免费份数为3份，每增加一份，之江公证处加收￥50，最少3份，最多1000份</div>
+
       </el-form-item>
-      <!--      <span>默认免费份数为3份，每增加一份，之江公证处加收￥50，最少3份，最多1000份</span>-->
       <el-form-item label="收件人姓名" prop="receiver">
         <el-input v-model="form.receiver" placeholder="请输入收件人姓名" />
       </el-form-item>
@@ -32,9 +33,9 @@
       <el-form-item label="备注" prop="comment">
         <el-input v-model="form.comment" placeholder="请备注快递公司名称" />
       </el-form-item>
-      <el-form-item>
-        <el-button style="width: 133px">返回</el-button>
-        <el-button type="primary" style="width:133px; margin-left: 24px" @click="submit">申请</el-button>
+      <el-form-item style="float: right;">
+        <el-button style="width: 150px">返回</el-button>
+        <el-button type="primary" style="width:150px; margin-left: 50px" @click="submit">申请</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -51,7 +52,7 @@ export default {
       form: {
         name: '',
         author: '',
-        count: '',
+        count: 3,
         receiver: '',
         receiverPhoneNum: '',
         receiverAddr: [],
@@ -74,7 +75,7 @@ export default {
     submit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          this.$message.success('申请成功')
           console.log(this.form)
         } else {
           console.log('error submit!!')
