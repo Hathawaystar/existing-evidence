@@ -34,7 +34,7 @@ export default {
 }
 
 .fixed-header+.app-main {
-  padding-top: 74px;
+  padding-top: 88px;
   min-height: 100vh;
 }
 
@@ -45,7 +45,7 @@ export default {
   }
 
   .fixed-header+.app-main {
-    padding-top: 108px;
+    padding-top: 122px;
   }
 }
 </style>
