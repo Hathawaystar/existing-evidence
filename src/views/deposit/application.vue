@@ -148,7 +148,7 @@ export default {
       }
       if (typeof type === 'undefined') {
         this.$notify({
-          title: '不支持的文件类型',
+          title: `不支持的${this.works[index].type ? this.workTypeOptions[this.works[index].type] : '文件'}类型`,
           message: this.$createElement('span', { style: 'color: teal' }, '请检查上传作品类型')
         })
         return false
@@ -278,5 +278,6 @@ export default {
 .submit-btn {
   margin-left: 48px;
   background-color: #10429a;
+  border-color: #10429a;
 }
 </style>
