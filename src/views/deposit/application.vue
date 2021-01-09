@@ -6,11 +6,16 @@
         <el-col :span="6" class="emphasis">作品{{ indexMap[index] }}</el-col>
         <el-col :span="18">
           <el-form :ref="`workForm${index}`" :model="works[index]" :rules="workRules" label-width="80">
-            <el-form-item label="作品名称:" prop="name" required>
+            <el-form-item label="作品名称:" prop="name">
               <el-input v-model="item.name" style="width: 330px" />
             </el-form-item>
-            <el-form-item label="作品种类:" prop="type" required>
-              <el-select v-model="item.type" style="width: 330px" placeholder="请选择">
+            <el-form-item label="作品种类:" prop="type">
+              <el-select
+                v-model="item.type"
+                style="width: 330px"
+                placeholder="请选择"
+                :disabled="works[index].fileId !== undefined"
+              >
                 <el-option
                   v-for="(opt, idx) in workTypeOptions"
                   :key="idx"
@@ -29,10 +34,11 @@
                 :accept="uploadAccept(index)"
                 :action="uploadAction"
                 :on-exceed="() => handleUploadExceed(index)"
-                :on-success="(res) => handleUploadSuccess(index, res)"
+                :on-success="(res, file, fileList) => handleUploadSuccess(index, res, file, fileList)"
                 :on-error="(err) => handleUploadError(index, err)"
-                :on-remove="(file) => handleFileRemove(index, file)"
+                :on-remove="(file, fileList) => handleFileRemove(index, file, fileList)"
                 :before-upload="(file) => beforeUpload(index, file)"
+                :file-list="uploadList[index]"
               >
                 <img src="../../assets/shangchuan.png" style="margin-top: 24px" alt="upload">
                 <div class="el-upload__text">拖动上传或打开文件上传</div>
@@ -43,7 +49,7 @@
         </el-col>
       </el-row>
       <div v-if="works.length > 1" class="close-button">
-        <i class="el-icon-close" @click="works.splice(index, 1)" />
+        <i class="el-icon-close" @click="handleRemoveWork(index)" />
       </div>
     </div>
 
@@ -95,9 +101,9 @@ export default {
       info: Object.assign({}, defaultWorkInfo),
 
       workRules: {
-        name: [{ required: true, message: '请输入作品名称', trigger: 'blur' }],
-        type: [{ required: true, message: '请选择作品类型', trigger: 'blur' }],
-        fileId: [{ required: true, message: '请上传作品文件', trigger: 'blur' }]
+        name: [{ required: true, message: '请输入作品名称', trigger: 'change' }],
+        type: [{ required: true, message: '请选择作品类型', trigger: 'change' }],
+        fileId: [{ required: true, message: '请上传作品文件', trigger: 'change' }]
       },
       infoRules: {
         ownerShip: [{ required: true, message: '请选择权利归属', trigger: 'blur' }],
@@ -115,7 +121,8 @@ export default {
         ['.png', '.jpg', '.jpeg'],
         ['.mp3'],
         ['.mp4', '.avi']
-      ]
+      ],
+      uploadList: [[]]
     }
   },
   methods: {
@@ -128,11 +135,12 @@ export default {
     handleUploadExceed(index) {
       this.$notify({
         title: '上传数超出上限',
-        message: this.$createElement('span', { style: 'color: teal' }, `请删除作品${this.indexMap[index]}已上传的文件后重试，或添加新作品`)
+        message: this.$createElement('span', { style: 'color: teal' },
+          `请删除作品${this.indexMap[index]}已上传的文件后重试，或添加新作品`)
       })
     },
     beforeUpload(index, file) {
-      const ext = file.name.substring(file.name.lastIndexOf('.'))
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
       let type
       if (typeof this.works[index].type === 'undefined') {
         // no type selected, check all
@@ -149,25 +157,26 @@ export default {
       if (typeof type === 'undefined') {
         this.$notify({
           title: `不支持的${this.works[index].type ? this.workTypeOptions[this.works[index].type] : '文件'}类型`,
-          message: this.$createElement('span', { style: 'color: teal' }, '请检查上传作品类型')
+          message: this.$createElement('span', { style: 'color: teal' },
+            `请检查作品${this.indexMap[index]}上传文件类型`)
         })
         return false
       }
       if (file.size / 1024 / 1024 > 100) {
         this.$notify({
           title: '文件大小超出上限',
-          message: this.$createElement('span', { style: 'color: teal' }, `作品${this.indexMap[index]}大小超出上限`)
+          message: this.$createElement('span', { style: 'color: teal' },
+            `作品${this.indexMap[index]}上传大小超出上限`)
         })
         return false
       }
-      const workForm = this.$refs[`workForm${index}`][0]
-      if (!workForm) return false
-      workForm.clearValidate('fileId')
+      if (!this.clearWorkFormValidate(index, 'fileId')) return false
       this.works[index].type = type
     },
-    handleUploadSuccess(index, res) {
+    handleUploadSuccess(index, res, file, fileList) {
       // TODO
-      this.works[index].fileId = 1
+      this.works[index].fileId = 1 // mock, or URL?
+      this.uploadList[index] = fileList // avoid style thrashing
     },
     handleUploadError(index, err) {
       if (err.message && typeof err.message === 'string') err = err.message
@@ -177,18 +186,29 @@ export default {
         message: this.$createElement('span', { style: 'color: teal' }, `作品${this.indexMap[index]}上传失败：${err}`)
       })
     },
-    handleFileRemove(index, file) {
+    handleFileRemove(index, file, fileList) {
       // TODO
+      this.uploadList[index] = fileList
+      this.works[index].fileId = undefined
+    },
+    handleRemoveWork(index) {
+      // TODO: handle file removal
+      this.works.splice(index, 1)
+      this.uploadList.splice(index, 1)
+      if (index !== 1) this.clearWorkFormValidate(index, 'fileId')
     },
     handleAddWork() {
-      if (this.works.length < 6) this.works.push(Object.assign({}, defaultWork))
+      if (this.works.length < 6) {
+        this.uploadList.push([])
+        this.works.push(Object.assign({}, defaultWork))
+      }
     },
     handleSubmit() {
       const promises = []
       for (let i = 0; i < this.works.length; i++) {
-        const workForm = this.$refs[`workForm${i}`][0]
-        if (!workForm) return
-        promises.push(workForm.validate())
+        const workForm = this.$refs[`workForm${i}`]
+        if (!workForm || !workForm[0]) return
+        promises.push(workForm[0].validate())
       }
       const infoForm = this.$refs['infoForm']
       if (!infoForm) return
@@ -199,7 +219,15 @@ export default {
     },
     submit() {
       // TODO
-      alert('fuck u')
+      alert('submitted')
+    },
+    clearWorkFormValidate(index, field) {
+      // return false if node not found
+      const workForm = this.$refs[`workForm${index}`]
+      if (!workForm || !workForm[0]) return false
+      if (field) workForm[0].clearValidate(field)
+      else workForm[0].clearValidate()
+      return true
     }
   }
 }
