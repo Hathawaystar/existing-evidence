@@ -47,12 +47,16 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo().then(response => {
         const { data } = response
 
         if (!data) {
           reject('Verification failed, please Login again.')
         }
+
+        // TODO: temp: since we don't need a role-based administration system,
+        //  everyone can be seen as an `admin` (maybe `user` is better...)
+        if (!data.roles) data.roles = ['admin']
 
         const { roles, name, avatar, introduction } = data
 
