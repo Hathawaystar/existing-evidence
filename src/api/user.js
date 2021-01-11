@@ -15,10 +15,9 @@ export function getInfo() {
   })
 }
 
-// TODO
-export function logout() {
-  return request({
-    url: '/vue-element-admin/user/logout',
-    method: 'post'
-  })
-}
+// export function logout() {
+//   return request({
+//     url: '/vue-element-admin/user/logout',
+//     method: 'post'
+//   })
+// }
