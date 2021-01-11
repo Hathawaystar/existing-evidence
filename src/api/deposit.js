@@ -1,11 +1,13 @@
 import request from '@/utils/request'
 
-export const createDepositItem = (data) =>
-  request({
+export const createDepositItem = (data) => {
+  return request({
     url: '/evidence/saveEvidence',
     method: 'post',
+    transformRequest: (data) => (data), // DO NOT stringify
     data
   })
+}
 
 export const getDepositList = () =>
   request({

@@ -234,6 +234,7 @@ export default {
       toSubmit.forEach((value, index) => {
         const view = {
           author: this.info.author,
+          file: value.file.raw,
           description: value.description,
           name: value.name,
           personorteam: this.info.ownerShip.toString(),
@@ -244,7 +245,6 @@ export default {
           // eslint-disable-next-line no-prototype-builtins
           if (value.hasOwnProperty(k)) formData.append(k, view[k])
         }
-        formData.append('file', this.uploadList[index][0])
         promises.push(createDepositItem(formData)
           .then(() => { value.status = 1 })
           .catch(() => { value.status = 2; hasFailed = true })
