@@ -171,7 +171,6 @@
 <script>
   import { Base64 } from 'js-base64'
   import { login, register } from '@/api/user'
-  import { setToken } from '@/utils/auth'
   import { defaultKaptcha, checkVerifyCode } from '@/api/kaptcha'
 export default {
   name: 'Login',
@@ -235,6 +234,7 @@ export default {
       re_password: '',
       code: '',
       code_img: '',
+      session_id: '',
     }
   },
   watch: {
@@ -303,15 +303,16 @@ export default {
     },
     defaultKaptcha(){
       defaultKaptcha().then(res=>{
-        this.code_img = window.URL.createObjectURL(res);
+        this.session_id = res.headers['access-sessionid'];
+        this.code_img = window.URL.createObjectURL(res.data);
       })
     },
     checkVerifyCode(){
-      checkVerifyCode(this.code).then(res=>{
+      checkVerifyCode(this.code,this.session_id).then(res=>{
         if(res.status !== 'success'){
-          this.$message.error('验证码不正确，请重新填写！');
-          this.defaultKaptcha();
           this.$set(this,'code','');
+          alert('验证码不正确，请重新填写！');
+          this.defaultKaptcha();
         }
       })
     },
