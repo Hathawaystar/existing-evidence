@@ -21,3 +21,12 @@ export function getInfo() {
 //     method: 'post'
 //   })
 // }
+
+//注册
+export function register(data) {
+    return request ({
+        url:'user/registerUser',
+        method: 'post',
+        data,
+    })
+}

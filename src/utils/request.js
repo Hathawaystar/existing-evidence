@@ -45,6 +45,7 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
+      return res;
 
     if (!res.status || res.status !== 'success') {
       Message({
