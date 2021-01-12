@@ -76,6 +76,7 @@ export default {
           status: '制证发证',
           content: value.content
         }))
+        this.$emit('fetched', this.list.length)
       })
     },
     handleDownload(value) {
