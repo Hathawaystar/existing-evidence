@@ -9,7 +9,7 @@ const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   transformRequest: (data) => (stringify(data)),
-  // withCredentials: true, // send cookies when cross-domain requests
+  withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
 
@@ -44,31 +44,36 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
+    if(response.headers['access-sessionid'] || !response.data.code){
+      return response;
+    } else {
+      const res = response.data
 
-    if (!res.status || res.status !== 'success') {
-      // 4001: Token expired; 4002: Illegal token;
-      if (res.code === 4001 || res.code === 4002) {
-        // to re-login
-        MessageBox.confirm('你已被登出。你可以取消继续留在这个页面，或重新登录。', '确认登出', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      } else {
+      if (!res.status || res.status !== 'success') {
         Message({
           message: res.message || 'Error',
           type: 'error',
           duration: 5 * 1000
         })
+
+        // TODO
+        // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+        if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+          // to re-login
+          MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+            confirmButtonText: 'Re-Login',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }).then(() => {
+            store.dispatch('user/resetToken').then(() => {
+              location.reload()
+            })
+          })
+        }
+        return Promise.reject(new Error(res.message || 'Error'))
+      } else {
+        return res
       }
-      return Promise.reject(new Error(res.message || 'Error'))
-    } else {
-      return res
     }
   },
   error => {
