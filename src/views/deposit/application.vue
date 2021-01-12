@@ -67,13 +67,13 @@
     <h3 class="head"> 作品基本信息 </h3>
     <div class="form-container body-container info">
       <el-form ref="infoForm" :model="info" :rules="infoRules" label-width="80" style="width: 400px; margin: 0 auto">
-        <el-form-item label="权利归属" prop="ownerShip" required>
+        <el-form-item label="权利归属" prop="ownerShip">
           <el-radio-group v-model="info.ownerShip">
             <el-radio :label="0">个人作品</el-radio>
             <el-radio :label="1">合作作品</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="作者名称" prop="author" required>
+        <el-form-item label="作者名称" prop="author">
           <el-input v-model="info.author" style="width: 330px" />
         </el-form-item>
       </el-form>
@@ -99,15 +99,15 @@
 import { createDepositItem } from '@/api/deposit'
 
 const defaultWork = {
-  name: undefined,
-  type: undefined,
-  description: undefined,
-  file: undefined,
+  name: '',
+  type: undefined, // number or undefined
+  description: '',
+  file: undefined, // object or undefined
   status: 0 // 0: not submitted, 1: submitted successfully, 2: failed
 }
 const defaultWorkInfo = {
-  ownerShip: undefined,
-  author: undefined
+  ownerShip: undefined, // number or undefined
+  author: ''
 }
 
 export default {
@@ -123,8 +123,8 @@ export default {
         file: [{ required: true, message: '请上传作品文件', trigger: 'change' }]
       },
       infoRules: {
-        ownerShip: [{ required: true, message: '请选择权利归属', trigger: 'blur' }],
-        author: [{ required: true, message: '请输入作者名称', trigger: 'blur' }]
+        ownerShip: [{ required: true, message: '请选择权利归属', trigger: 'change' }],
+        author: [{ required: true, message: '请输入作者名称', trigger: 'change' }]
       },
 
       workTypeOptions: ['文档', '图片', '音频', '视频'],
@@ -211,15 +211,15 @@ export default {
     },
     handleSubmit() {
       const promises = []
-      const toSubmit = new Map()
+      const toSubmit = []
       this.works.forEach((value, index) => {
         if (value.status === 1) return
         const workForm = this.$refs[`workForm${index}`]
         if (!workForm || !workForm[0]) return
         promises.push(workForm[0].validate())
-        toSubmit.set(index, value)
+        toSubmit.push(value)
       })
-      if (toSubmit.size === 0) { this.triggerSuccess(); return }
+      if (toSubmit.length === 0) { this.triggerSuccess(); return }
       const infoForm = this.$refs['infoForm']
       if (!infoForm) return
       promises.push(infoForm.validate())
@@ -231,11 +231,11 @@ export default {
       const promises = []
       let hasFailed = false
       this.submitting = true
-      toSubmit.forEach((value, index) => {
+      toSubmit.forEach((value) => {
         const view = {
           author: this.info.author,
-          file: value.file.raw,
           description: value.description,
+          file: value.file.raw,
           name: value.name,
           personorteam: this.info.ownerShip.toString(),
           type: value.type.toString()
@@ -243,7 +243,7 @@ export default {
         const formData = new FormData()
         for (const k in view) {
           // eslint-disable-next-line no-prototype-builtins
-          if (value.hasOwnProperty(k)) formData.append(k, view[k])
+          if (view.hasOwnProperty(k)) formData.append(k, view[k])
         }
         promises.push(createDepositItem(formData)
           .then(() => { value.status = 1 })
