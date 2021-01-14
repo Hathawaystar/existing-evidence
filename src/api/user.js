@@ -27,6 +27,9 @@ export function register(data) {
     return request ({
         url:'user/registerUser',
         method: 'post',
-        data,
+        data:{
+          'username':data.username,
+          'password':data.password
+        },
     })
 }

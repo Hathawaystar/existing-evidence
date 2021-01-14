@@ -10,7 +10,7 @@ const service = axios.create({
   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   transformRequest: (data) => (stringify(data)),
   withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 5000, // request timeout
 })
 
 // request interceptor
@@ -44,7 +44,7 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    if(response.headers['access-sessionid'] || !response.data.code){
+    if(response.headers['verify-token'] || !response.data.code){
       return response;
     } else {
       const res = response.data

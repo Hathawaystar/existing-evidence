@@ -98,9 +98,9 @@
           </span>
             <el-input
                     ref="code"
-                    v-model="code"
+                    v-model="registerForm.code"
                     placeholder="请输入验证码"
-                    name=""
+                    name="code"
                     type="text"
                     tabindex="1"
                     autocomplete="on"
@@ -144,10 +144,10 @@
               <el-input
                       :key="passwordType"
                       ref="re_password"
-                      v-model="re_password"
+                      v-model="registerForm.re_password"
                       :type="passwordType"
                       placeholder="请确认密码"
-                      name=""
+                      name="re_password"
                       tabindex="2"
                       autocomplete="on"
                       @keyup.native="checkCapslock"
@@ -214,7 +214,9 @@ export default {
       },
       registerForm:{
         username: '',
-        password: ''
+        password: '',
+        code: '',
+        re_password: ''
       },
       Rules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -234,7 +236,7 @@ export default {
       re_password: '',
       code: '',
       code_img: '',
-      session_id: '',
+      verify_token: '',
     }
   },
   watch: {
@@ -303,14 +305,14 @@ export default {
     },
     defaultKaptcha(){
       defaultKaptcha().then(res=>{
-        this.session_id = res.headers['access-sessionid'];
+        this.verify_token = res.headers['verify-token'];
         this.code_img = window.URL.createObjectURL(res.data);
       })
     },
     checkVerifyCode(){
-      checkVerifyCode(this.code,this.session_id).then(res=>{
-        if(res.status !== 'success'){
-          this.$set(this,'code','');
+      checkVerifyCode(this.registerForm.code,this.verify_token).then(res=>{
+        if(res.data.status !== 'success'){
+          this.$set(this,'registerForm.code','');
           alert('验证码不正确，请重新填写！');
           this.defaultKaptcha();
         }
@@ -319,8 +321,8 @@ export default {
     handleRegister() {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
-          if(this.re_password !== this.registerForm.password){
-            this.$set(this, 're_password','');
+          if(this.registerForm.re_password !== this.registerForm.password){
+            this.$set(this, 'registerForm.re_password','');
             this.$message.warning('两次密码不一致，请重新输入！');
             return false;
           }
@@ -328,9 +330,9 @@ export default {
           register( this.registerForm).then(res=>{
             this.linkToLogin();
             this.$refs['registerForm'].resetFields();
-            this.$set(this,'code','');
-            this.$set(this,'re_password','');
-            this.$message.success('注册成功，请登录！');
+            this.$set(this,'registerForm.code','');
+            this.$set(this,'registerForm.re_password','');
+            alert('注册成功，请登录！');
             this.loading = false
           }).catch(() => {
             this.loading = false
