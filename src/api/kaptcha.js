@@ -8,15 +8,13 @@ export function defaultKaptcha() {
   })
 }
 
-export function checkVerifyCode(code,sessionId) {
+export function checkVerifyCode(code,verify_token) {
   return request({
     url:'/kaptcha/checkVerifyCode',
     method:'post',
-    // headers:{
-    //     Cookies:'JSESSIONID='+sessionId
-    // },
-    params:{
-      verificationCode:code,
+    data:{
+      verifyCode :code,
+      verifyToken:verify_token
     }
   })
 }
