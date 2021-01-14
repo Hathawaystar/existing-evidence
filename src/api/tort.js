@@ -2,8 +2,9 @@ import request from '@/utils/request'
 
 export const saveTort = (data) => {
   return request({
-    url: `/tort/saveTort?author=${data.author}&url=${data.url}`,
-    method: 'post'
+    url: `/tort/saveTort`,
+    method: 'post',
+    data
   })
 }
 

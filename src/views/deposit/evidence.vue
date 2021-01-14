@@ -79,7 +79,6 @@ export default {
   },
   created() {
     const query = this.$route.query
-    console.log(query)
     this.content = query.content
     this.description = query.description
     this.personorteam = query.personorteam

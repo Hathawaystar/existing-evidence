@@ -42,7 +42,6 @@ export default {
           body.url = this.form.url
           body.description = this.form.comment
           body.author = this.$store.getters.username
-          console.log(body)
           saveTort(body).then(res => {
             this.$message.success('申请成功')
           })
